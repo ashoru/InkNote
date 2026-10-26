@@ -231,3 +231,69 @@ Not verified by the builder. Please run each item and report back:
 - v1 (this build): canonical model v1, project skeleton, notebook
   management, PencilKit editor, PDF annotation + rendered export,
   .note importer prototype with Mac offline validation, this log.
+
+## 9. Release 0.1.0 build 1 — GitHub Actions unsigned IPA
+
+- Repository: https://github.com/ashoru/InkNote — created public.
+  AT Music is also public, and this code contains no private note
+  samples, so public follows that convention. The repository can be
+  switched to private at any time; that change does not affect the IPA.
+- Version in the build: MARKETING_VERSION 0.1.0,
+  CURRENT_PROJECT_VERSION 1, bundle id com.ashoru.inknote,
+  minimum iOS 18.0, iPhone + iPad. The version was changed from the
+  v1 build's 1.0 to 0.1.0 in tools/generate_project.py before release;
+  the generated project was regenerated and verified.
+- Workflow: .github/workflows/build-unsigned-ipa.yml, adapted from
+  AT Music's unsigned-IPA workflow (read-only reference, AT Music was
+  not modified). Differences from AT Music: it runs
+  tools/generate_project.py instead of XcodeGen, reads the version
+  from InkNote.xcodeproj/project.pbxproj instead of project.yml, and
+  does not copy AT Music's version, CHANGELOG or signing setup.
+- Push model, stated plainly: GitHub main is a snapshot history.
+  The repository was empty, and the Git Data API cannot create blobs
+  in an empty repository (409 "Git Repository is empty"), and git
+  over HTTPS from a non-interactive session cannot read the Mac
+  keychain. So the first commit on GitHub was created with the
+  Contents API (README only, commit 2a1ca8e4c5803508515b674052267e8a7accef43),
+  then the full v1 tree was pushed with the Git Data API as a
+  snapshot commit eba5e3bbf4d5bb99865fb67e77f71f06deb962a2, whose
+  tree sha 0eac33857282a1e5f8f969bdfec4614788a03eb2 exactly matches
+  the Mac local commit c912aa6b9b349f2d850231677b5e80b3aede1235.
+  Mac main stays at c912aa6; GitHub main is not the same commit sha,
+  but the file tree is identical. Future pushes use the same
+  snapshot model (tree verification, GitHub HEAD as parent), not a
+  claim that Mac and GitHub commit shas match.
+- Private samples excluded, verified before commit: git status was
+  checked item by item. Validation/ and ValidationSamples/ (which
+  contain .note samples), and any .note, .ipa, .app file are in
+  .gitignore and were not staged. The staged list was 19 files:
+  workflow, .gitignore, this log, project.pbxproj, README, 13 Swift
+  sources, tools/generate_project.py. This log records only sample
+  statistics (curve counts, point counts), never note body text.
+- Actions run: workflow_dispatch, run 40312043075,
+  https://github.com/ashoru/InkNote/actions/runs/40312043075,
+  conclusion success. "Triggered" was not accepted as complete; the
+  run was polled to completed/success.
+- Release: https://github.com/ashoru/InkNote/releases/tag/v0.1.0-build1,
+  name "InkNote 0.1.0 (build 1)", not a draft, not a prerelease.
+  Assets: InkNote-0.1.0-build1-unsigned.ipa (280329 bytes) and
+  InkNote-0.1.0-build1-unsigned.ipa.sha256.
+- IPA verification, done locally after download from the Release
+  (not from the build log alone): shasum -c on the .sha256 file
+  passed, SHA-256
+  d50633fb5f7955ddd36baa1ac17a8218986aabaf015f6a8906f8bd27da638bc8.
+  Unpacked Info.plist: CFBundleIdentifier com.ashoru.inknote,
+  CFBundleShortVersionString 0.1.0, CFBundleVersion 1,
+  MinimumOSVersion 18.0, CFBundleExecutable InkNote,
+  UIDeviceFamily [1, 2]. Main binary Payload/InkNote.app/InkNote,
+  1031160 bytes, present. The local IPA copy was kept only for this
+  verification in /tmp and is not a deliverable; DerivedData and
+  temporary IPA copies on the Mac were cleaned after the build.
+- Note on section 7: "any GitHub push" was the v1 build scope. This
+  section supersedes it for this release only: the push above is the
+  release push, and no other IPA was distributed.
+- Sideloading note (for the device checklist): the IPA is unsigned.
+  Downloading it does not install it on a device. Sign it yourself,
+  for example in Xcode with your own Apple ID, or with a sideloading
+  tool you trust, before installing it on an iPhone or iPad. Do not
+  present the Release download as install-and-run.
