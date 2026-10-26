@@ -16,6 +16,14 @@ import UIKit
 // Limitation, stated honestly: the exported PDF is rendered (raster),
 // not a vector ink annotation. Vector ink export is a future stage;
 // it must not be claimed for v1.
+//
+// Localization (0.1.2): static labels are literals (LocalizedStringKey
+// via the catalog); the page indicator is a localized format shown
+// verbatim; error strings are composed with String(localized:)
+// formats at the point they are set, and shown verbatim so a message
+// containing user data is never re-localized as a key.
+// Look (0.1.2): same chrome rule as the paper editor — system grouped
+// background, page with margin and shadow, paper content untouched.
 
 #if canImport(UIKit)
 public struct PDFNoteView: View {
@@ -36,18 +44,26 @@ public struct PDFNoteView: View {
     public var body: some View {
         VStack {
             HStack {
-                Button("Previous") { saveCurrentPage(); if pageIndex > 0 { pageIndex -= 1; loadCurrentPage() } }
-                    .disabled(pageIndex == 0)
+                Button { saveCurrentPage(); if pageIndex > 0 { pageIndex -= 1; loadCurrentPage() } } label: {
+                    Label("Previous", systemImage: "chevron.left")
+                }
+                .disabled(pageIndex == 0)
                 Spacer()
-                Text("PDF page \(pageIndex + 1) of \(max(pageImages.count, 1))")
+                Text(verbatim: String(format: String(localized: "PDF page %lld of %lld"), pageIndex + 1, max(pageImages.count, 1)))
                     .font(.subheadline)
                 Spacer()
-                Button("Export PDF") { exportAnnotatedPDF() }
+                Button { saveCurrentPage(); if pageIndex < pageImages.count - 1 { pageIndex += 1; loadCurrentPage() } } label: {
+                    Label("Next", systemImage: "chevron.right")
+                }
+                .disabled(pageIndex >= max(pageImages.count - 1, 0))
+                Button { exportAnnotatedPDF() } label: {
+                    Label("Export PDF", systemImage: "square.and.arrow.up")
+                }
             }
             .padding(.horizontal)
             .padding(.vertical, 8)
             if !loadError.isEmpty {
-                Text(loadError).foregroundStyle(.red).padding()
+                Text(verbatim: loadError).foregroundStyle(.red).padding()
             } else if pageImages.isEmpty {
                 ProgressView("Loading PDF…")
             } else {
@@ -62,12 +78,15 @@ public struct PDFNoteView: View {
                         }
                         .frame(width: image.size.width, height: image.size.height)
                     }
+                    .shadow(color: .black.opacity(0.18), radius: 8, x: 0, y: 2)
+                    .padding(16)
                 }
                 .onAppear { loadCurrentPage() }
                 .onChange(of: pageIndex) { _, _ in loadCurrentPage() }
             }
         }
-        .navigationTitle(document.manifest.name)
+        .background(Color(.systemGroupedBackground))
+        .navigationTitle(Text(verbatim: document.manifest.name))
         .task { await loadPDFPages() }
         .onDisappear {
             saveCurrentPage()
@@ -75,14 +94,16 @@ public struct PDFNoteView: View {
         }
         .sheet(isPresented: $showingShare) {
             if let url = exportURL {
-                ShareLink("Exported PDF", item: url)
+                ShareLink(item: url) {
+                    Label("Exported PDF", systemImage: "square.and.arrow.up")
+                }
             }
         }
     }
 
     private func loadPDFPages() async {
         guard let pdfName = document.pdfFileName else {
-            loadError = "This note has no PDF file."
+            loadError = String(localized: "This note has no PDF file.")
             return
         }
         let dir = store.noteDirectory(for: document.manifest.id)
@@ -105,7 +126,7 @@ public struct PDFNoteView: View {
             return result
         }.value
         if images.isEmpty {
-            loadError = "Could not load the PDF file."
+            loadError = String(localized: "Could not load the PDF file.")
         } else {
             pageImages = images
             // Ensure the canonical document has one page per PDF page.
@@ -159,7 +180,7 @@ public struct PDFNoteView: View {
                     }
                 } catch {
                     DispatchQueue.main.async {
-                        loadError = "Export failed: \(error.localizedDescription)"
+                        loadError = String(format: String(localized: "Export failed: %@"), error.localizedDescription)
                     }
                 }
             }

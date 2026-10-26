@@ -22,11 +22,11 @@ public enum FormulaError: Error, LocalizedError {
     case divisionByZero
     public var errorDescription: String? {
         switch self {
-        case .empty: return "Empty expression"
-        case .unexpectedCharacter(let c): return "Unexpected character '\(c)'"
-        case .unexpectedEnd: return "Unexpected end of expression"
-        case .unknownVariable(let v): return "Unknown variable '\(v)'"
-        case .divisionByZero: return "Division by zero"
+        case .empty: return String(localized: "Empty expression")
+        case .unexpectedCharacter(let c): return String(format: String(localized: "Unexpected character '%@'"), String(c))
+        case .unexpectedEnd: return String(localized: "Unexpected end of expression")
+        case .unknownVariable(let v): return String(format: String(localized: "Unknown variable '%@'"), v)
+        case .divisionByZero: return String(localized: "Division by zero")
         }
     }
 }

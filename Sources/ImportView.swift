@@ -13,6 +13,11 @@ import UniformTypeIdentifiers
 // If the file contains media or audio that v1 does not parse, the
 // import still succeeds for strokes + PDF and the result screen says
 // so explicitly; it does not claim a complete import.
+//
+// Localization (0.1.2): static labels are literals (LocalizedStringKey
+// via the catalog); the result block is composed from localized
+// formats and shown verbatim, so imported file names and paper codes
+// are never re-localized as catalog keys.
 
 #if canImport(UIKit)
 public struct ImportView: View {
@@ -31,14 +36,16 @@ public struct ImportView: View {
                 Text("Import a .note package exported from your own notes. The original file is never modified.")
                     .multilineTextAlignment(.center)
                     .padding()
-                Button("Choose .note File") { showingPicker = true }
-                    .buttonStyle(.borderedProminent)
+                Button { showingPicker = true } label: {
+                    Label("Choose .note File", systemImage: "square.and.arrow.down")
+                }
+                .buttonStyle(.borderedProminent)
                 if isImporting {
                     ProgressView("Importing…")
                 }
                 if !resultText.isEmpty {
                     ScrollView {
-                        Text(resultText)
+                        Text(verbatim: resultText)
                             .font(.system(.body, design: .monospaced))
                             .padding()
                     }
@@ -71,24 +78,24 @@ public struct ImportView: View {
                         isImporting = false
                         if success {
                             resultText = [
-                                "Imported: \(summary.name)",
-                                "Curves: \(summary.curveCount)",
-                                "Points: \(summary.pointCount)",
-                                "Paper: \(summary.paperSize) \(summary.paperOrientation)",
-                                "Session format: \(summary.sessionFormatVersion)",
-                                "PDF files: \(summary.pdfFileNames.joined(separator: ", "))",
-                                "Saved as a canonical InkNote note. Original .note untouched."
+                                String(format: String(localized: "Imported: %@"), summary.name),
+                                String(format: String(localized: "Curves: %lld"), summary.curveCount),
+                                String(format: String(localized: "Points: %lld"), summary.pointCount),
+                                String(format: String(localized: "Paper: %@ %@"), DisplayStrings.paperSizeDisplay(summary.paperSize), DisplayStrings.orientationDisplay(summary.paperOrientation)),
+                                String(format: String(localized: "Session format: %lld"), summary.sessionFormatVersion),
+                                String(format: String(localized: "PDF files: %@"), summary.pdfFileNames.joined(separator: ", ")),
+                                String(localized: "Saved as a canonical InkNote note. Original .note untouched.")
                             ].joined(separator: "\n")
                             store.loadManifests()
                         } else {
-                            resultText = "Import parsed, but saving failed."
+                            resultText = String(localized: "Import parsed, but saving failed.")
                         }
                     }
                 }
             } catch {
                 DispatchQueue.main.async {
                     isImporting = false
-                    resultText = "Import failed: \(error.localizedDescription)"
+                    resultText = String(format: String(localized: "Import failed: %@"), error.localizedDescription)
                 }
             }
         }

@@ -394,3 +394,229 @@ Not verified by the builder. Please run each item and report back:
   decode now open; a load failure now shows an error with a real
   Retry instead of spinning forever; notes already on disk were
   never deleted and become readable again after this update.
+
+## 12. Update 0.1.2 build 3 — localization (zh-Hans + en) and restrained UI polish
+
+- User feedback (device, 2026-10-26): the whole app was hardcoded
+  English and the interface looked too plain. Asked for: a Chinese
+  version, both Chinese and English supported, and interface polish.
+  Scope of this build is exactly that. AT Music was not touched.
+  Nothing in this build changes the canonical model, the store, the
+  importer logic, or any file format.
+
+### 12.1 Localization: String Catalog, system language follows
+
+- New file Localizable.xcstrings at the project root, 76 keys, with
+  en and zh-Hans translations for every key. The app follows the
+  system language; there is no in-app language switcher in this build.
+- Static labels use string literals, which SwiftUI treats as
+  LocalizedStringKey and resolves through the catalog: list toolbar
+  and alerts, editor and PDF toolbars, import view, iPad detail
+  placeholder, load-failure and retry states, empty states.
+- Programmatic strings use String(localized:) with a format, then
+  String(format:), and are shown verbatim so they are never
+  re-localized as keys: "Page %lld of %lld" / "PDF page %lld of %lld"
+  (zh: "第 %lld 页，共 %lld 页" / "PDF 第 %lld 页，共 %lld 页"),
+  "Notes in %@", import result lines (Imported / Curves / Points /
+  Paper / Session format / PDF files), and all LocalizedError texts
+  in BPlist, NoteImporter, FormulaEvaluator and FutureServices.
+  No Chinese/English mixing: every interpolated value goes through a
+  catalog format, including curve/point counts.
+- Dates keep the system style: Text(date, style: .date) in list rows
+  was already system-localized and is unchanged. No hand-built
+  English month names exist anywhere.
+- User data is never localized: note names, user-created folder
+  names, imported file names and paper codes are shown with
+  Text(verbatim:) (the old code passed some of them through Text(String),
+  which would have re-localized a name that happened to match a
+  catalog key). Paper size / orientation codes from an imported file
+  are display-mapped only ("a4" -> "A4", "letter" -> "Letter",
+  "portrait" -> "竖向", "landscape" -> "横向"); the stored summary
+  values are untouched.
+- Folder mapping decision (display layer only, storage untouched):
+  the stored folder key stays "Unsorted" on disk, in every filter
+  comparison and in every Picker tag. Only the displayed word is
+  mapped ("Unsorted" -> "未分类" in zh, "Unsorted" in en) via
+  DisplayStrings.folderDisplayName. A user-created folder such as
+  "tt" is displayed exactly as typed. An empty new-note name takes
+  the current system language's default at creation time
+  ("Untitled" / "未命名"); that is a name, not a filter key, so
+  existing notes keep their names when the language changes.
+  Why old notes cannot be lost: the list filter compares
+  manifest.folder against the selected storage value, never against
+  the display word, so a language switch cannot orphan a note.
+  Validation for this, Mac offline, exit 0, 7 checks PASS: an old
+  manifest (name ttt, folder "Unsorted") decodes unchanged, filters
+  in under the storage value "Unsorted", a "tt" folder displays
+  unchanged, and the display functions route through the catalog
+  lookup. The zh display word itself is proven from the built app
+  bundle, not from this CLI run (the CLI tool has no catalog bundle
+  and correctly falls back to the English key): the built bundle's
+  zh-Hans.lproj/Localizable.strings maps "Unsorted" => "未分类"
+  (see 12.5).
+- Two user-visible English leaks found by a literal scan and fixed
+  here, not in the original task list: the importer's fallback note
+  name "Imported Note" (shown in the list when a .note has no name)
+  and the "Missing $objects/$top in Session.plist" detail wrapped
+  into sessionParseFailed. Both now go through the catalog
+  ("导入的笔记" / "Session.plist 中缺少 $objects/$top", archive
+  key names kept verbatim).
+- Hardcoded-English grep after the change (Sources/): every UI
+  literal is either a catalog key (verified: all String(localized:)
+  keys exist in the catalog, and every Text/Button/Label/Section/
+  Picker/TextField/ProgressView literal was checked against it) or
+  one of these allowed exceptions, listed here so a future grep is
+  not mistaken for a regression: app name "InkNote"; storage keys
+  "Unsorted", "inknote", "imported-note" (display-mapped, never
+  shown raw except through DisplayStrings); file/format tokens
+  (".note", ".pdf", "a4", "letter", "portrait", "landscape",
+  bplist/ZIP/plist key names, paper template codes); SF Symbol
+  names; parser single-character tokens; the internal save-failure
+  print in Store.swift (log only, never shown in UI).
+
+### 12.2 Interface polish (native components only)
+
+- Toolbars and actions use Label (SF Symbol + system text style):
+  New Note square.and.pencil, Folder folder, Import
+  square.and.arrow.down, Previous chevron.left, Next chevron.right,
+  Add Page plus, Save checkmark, Export PDF square.and.arrow.up,
+  Rename pencil, Delete trash, Retry arrow.clockwise.
+  Save icon choice, recorded deliberately: checkmark, not
+  tray.and.arrow.down. Saving here is an in-place persist, not a
+  download and not an export to another location (export already
+  uses square.and.arrow.up, import uses square.and.arrow.down), so
+  a download-style icon would confuse save with import/export.
+- Next buttons are new in this build: the paper editor and the PDF
+  view previously had only Previous (forward was only possible via
+  Add Page in the paper editor, and not at all in the PDF view).
+  Both now have Previous / Next with correct disabled states.
+- List: thumbnails 44x56 -> 56x72 (one step up, inside the 60x76
+  budget so the list cannot stutter), still loaded lazily per row
+  from thumb.png on a background task; rows show name, localized
+  source (Imported / InkNote) and system-localized modified date.
+  Added .searchable: it filters only the in-memory manifests by
+  name, never reads pages.json, so search cannot slow down on large
+  notes. Empty states are real states, not a grey line: the list
+  shows an icon + "No notes yet" + New Note button (or "No matching
+  notes" while searching), and the iPad detail placeholder shows an
+  icon + sentence + New Note button.
+- Editor and PDF view: the page now sits on the system grouped
+  background with a margin and a soft shadow, so the page has depth
+  in both light and dark mode. The chrome follows the system; the
+  paper itself stays white content in both modes and is never
+  painted dark. Save feedback is transient: "Saved" clears itself
+  after 1.5 seconds (one-shot Task sleep guarded by a token, not a
+  timer or poll) instead of occupying a permanent row. The page
+  indicator stays in the toolbar row.
+- iPad detail limitation, stated honestly: the detail pane's New
+  Note button creates a note in the Unsorted folder, which then
+  appears in the list to open; it does not jump straight into the
+  editor, because the detail pane is not a navigation destination
+  in v1. Wiring selection through the split view is future work,
+  not claimed here.
+- Performance / power rules, unchanged and re-checked: the list
+  still loads manifests + thumbnails only; search is memory-only;
+  thumbnails and PDF pages are still lazy and background-loaded;
+  no polling, no animation loop, no large-area blur was added
+  (the page shadow is a static one-shot effect, not a live blur).
+
+### 12.3 App icon (original artwork, drawn in code)
+
+- New script tools/make_appicon.swift (kept in tools/, not in
+  Sources/, so the project generator does not compile it into the
+  app). It draws with CoreGraphics only — no AppKit window server —
+  so it runs over SSH: a blue-to-teal gradient field, a white ruled
+  paper sheet, and an amber pencil leaning across it. No other
+  app's icon, shape or trademark is copied.
+- Output: Assets.xcassets/AppIcon.appiconset with Contents.json
+  listing 18 sizes (iPhone, iPad, App Store) and one PNG per size,
+  all scaled from the 1024x1024 master with sips (AppIcon-1024.png
+  for the store slot, e.g. 180x180 for 60pt @3x, 167x167 for
+  83.5pt @2x). A first attempt that pointed every slot at the
+  single 1024 file built but produced actool size warnings for
+  every slot; the per-size files removed all of them (see 12.5).
+  The unreferenced 1024 draft file was removed from the set.
+- tools/generate_project.py now includes a resources build phase:
+  Assets.xcassets and Localizable.xcstrings are file references in
+  the main group and in PBXResourcesBuildPhase, knownRegions gains
+  zh-Hans, and the target sets ASSETCATALOG_COMPILER_APPICON_NAME
+  to AppIcon. The Actions workflow already regenerates the project
+  from this script, so the release build picks the resources up
+  with no workflow change.
+
+### 12.4 Files changed in this build
+
+- New: Sources/DisplayStrings.swift (display mappings only),
+  Localizable.xcstrings (76 keys), Assets.xcassets (icon set),
+  tools/make_appicon.swift.
+- Modified: NotebookListView, NoteEditorView, PDFNoteView,
+  ImportView, InkNoteApp, BPlist, FormulaEvaluator,
+  FutureServices, NoteImporter (error texts only), plus
+  tools/generate_project.py and the generated project.pbxproj.
+- Unchanged: CanonicalModel, Store, PencilCanvas,
+  PaperTemplateView, Validation/, ValidationSamples/ (never staged).
+
+### 12.5 Build and validation (Mac, xcodebuild, unsigned)
+
+- Version: 0.1.2 build 3 (MARKETING_VERSION 0.1.2,
+  CURRENT_PROJECT_VERSION 3, bundle com.ashoru.inknote, minimum
+  iOS 18.0). The generated pbxproj was grepped after regeneration:
+  both version values appear in both configurations, and
+  Assets.xcassets + Localizable.xcstrings are in the resources phase.
+- Clean rebuild, Xcode 26.6, macOS 26.3.1, arm64:
+  ** BUILD SUCCEEDED **, exit 0, no error lines. Icon size
+  warnings are gone after the per-size fix. The only remaining
+  warning line in the log is an AppIntents metadata-processor note
+  ("Metadata extraction skipped. No AppIntents.framework
+  dependency found"), which is tool noise about a framework the
+  app does not use, not an app warning.
+- Built bundle checks (not from the build log alone): Info.plist
+  CFBundleIdentifier com.ashoru.inknote,
+  CFBundleShortVersionString 0.1.2, CFBundleVersion 3,
+  MinimumOSVersion 18.0; Assets.car present and the app-icon PNGs
+  ship in the bundle; en.lproj and zh-Hans.lproj each contain a
+  compiled Localizable.strings with 76 entries, spot-checked with
+  plutil (zh: "New Note" => "新建笔记", "Page %lld of %lld" =>
+  "第 %lld 页，共 %lld 页", "Unsorted" => "未分类",
+  "Previous" => "上一页"; en values are identity). Format
+  placeholders (%lld, %@) survive compilation intact.
+- Importer regression, same three samples, exit 0, RESULT PASS:
+  small 0 curves / 0 points, medium 125 / 3362, pdf 3 / 30 with 1
+  PDF, formula 2+3*4 = 14. The error-text localization did not
+  change any parse result.
+- Folder validation, exit 0, 7 checks PASS (see 12.1).
+- Two real mistakes found and fixed during this build itself:
+  1. The single-PNG icon set warned on every slot (see 12.3).
+  2. The folder validation script first failed to compile with
+     "expressions are not allowed at the top level" because only a
+     file named main.swift may carry top-level code when several
+     files are compiled together — the same pitfall recorded in
+     0.1.1. Fixed by compiling the script as main.swift in its own
+     directory; it is a /tmp validation script, not repo code.
+- DerivedData for InkNote was cleaned after the build, to respect
+  the ~28 GB free disk. No IPA was produced or kept locally.
+
+### 12.6 Device retest for 0.1.2 (not verified by the builder)
+
+1. System language Chinese: list, alerts, editor toolbar, PDF
+   toolbar, load-failure retry and import result all show Chinese,
+   with no English placeholder and no misplaced numbers in the
+   page indicator ("第 x 页，共 y 页") or import counts.
+2. System language English: the same screens show the English
+   texts, and switching the language back does not lose any note.
+3. Old note ttt: still listed under the unclassified folder after
+   the update (displayed as "未分类" in Chinese), opens, and keeps
+   its name.
+4. New note with an empty name: created with the current language's
+   default name ("未命名" in Chinese, "Untitled" in English).
+5. List: search filters by name; empty list and empty search show
+   the new empty states; thumbnails look right at the larger size.
+6. Editor / PDF: page has a margin and shadow on both light and
+   dark mode, paper stays white, Next moves forward, Save shows a
+   brief "Saved" that disappears on its own.
+7. Home screen: the new icon actually shows (the builder verified
+   the icon files ship in the bundle, not how iOS renders them on
+   a home screen).
+8. iPad detail placeholder: icon + sentence + New Note button;
+   tapping New Note creates a note in the unclassified folder,
+   visible in the list to open (see the limitation in 12.2).

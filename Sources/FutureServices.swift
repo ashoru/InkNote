@@ -26,7 +26,16 @@ public enum FutureServiceError: Error, LocalizedError {
     case notImplementedInV1(String)
     public var errorDescription: String? {
         switch self {
-        case .notImplementedInV1(let feature): return "\(feature) is interface-only in InkNote v1 and is not implemented yet"
+        case .notImplementedInV1(let feature):
+            let name: String
+            switch feature {
+            case "NAS sync": name = String(localized: "NAS sync")
+            case "Audio transcription": name = String(localized: "Audio transcription")
+            case "Handwriting recognition": name = String(localized: "Handwriting recognition")
+            case "Handwritten formula recognition": name = String(localized: "Handwritten formula recognition")
+            default: name = feature
+            }
+            return String(format: String(localized: "%@ is interface-only in InkNote v1 and is not implemented yet"), name)
         }
     }
 }

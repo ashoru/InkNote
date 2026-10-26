@@ -49,11 +49,11 @@ public enum NoteImporterError: Error, LocalizedError {
     case curvesMissing
     public var errorDescription: String? {
         switch self {
-        case .zipNotFound: return "ZIP end-of-central-directory not found"
-        case .zipUnsupportedMethod(let m): return "ZIP entry uses unsupported compression method \(m); only store (0) is supported in v1"
-        case .sessionNotFound: return "Session.plist not found inside the .note package"
-        case .sessionParseFailed(let s): return "Session.plist parse failed: \(s)"
-        case .curvesMissing: return "Handwriting curves not found in Session.plist"
+        case .zipNotFound: return String(localized: "ZIP end-of-central-directory not found")
+        case .zipUnsupportedMethod(let m): return String(format: String(localized: "ZIP entry uses unsupported compression method %lld; only store (0) is supported in v1"), m)
+        case .sessionNotFound: return String(localized: "Session.plist not found inside the .note package")
+        case .sessionParseFailed(let s): return String(format: String(localized: "Session.plist parse failed: %@"), s)
+        case .curvesMissing: return String(localized: "Handwriting curves not found in Session.plist")
         }
     }
 }
@@ -180,7 +180,7 @@ public enum NoteImporter {
               case let .dict(topRef) = topDict["$top"] ?? .null,
               case let .uid(sessionIndex) = topRef["$0"] ?? .null,
               case let .dict(session) = objects[safe: sessionIndex] ?? .null else {
-            throw NoteImporterError.sessionParseFailed("Missing $objects/$top in Session.plist")
+            throw NoteImporterError.sessionParseFailed(String(localized: "Missing $objects/$top in Session.plist"))
         }
         func resolve(_ value: BPlistValue?) -> BPlistValue? {
             guard let value = value else { return nil }
@@ -193,7 +193,7 @@ public enum NoteImporter {
             return resolve(dict[key])
         }
         let sessionFormatVersion = dictValue(session, "sessionFormatVersion")?.asInt ?? 0
-        let name = dictValue(session, "name")?.asString ?? "Imported Note"
+        let name = dictValue(session, "name")?.asString ?? String(localized: "Imported Note")
         // Paper attributes: session -> DocumentPaperLayoutModel -> PaperAttributes.
         var paperSize = "letter"
         var paperOrientation = "portrait"

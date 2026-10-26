@@ -54,10 +54,10 @@ public enum BPlistError: Error, LocalizedError {
     case invalidOffset
     public var errorDescription: String? {
         switch self {
-        case .notBPlist: return "Not a bplist00 file"
-        case .truncated: return "Truncated bplist file"
-        case .unsupportedMarker(let m): return "Unsupported bplist marker \(m)"
-        case .invalidOffset: return "Invalid bplist offset"
+        case .notBPlist: return String(localized: "Not a bplist00 file")
+        case .truncated: return String(localized: "Truncated bplist file")
+        case .unsupportedMarker(let m): return String(format: String(localized: "Unsupported bplist marker %lld"), Int(m))
+        case .invalidOffset: return String(localized: "Invalid bplist offset")
         }
     }
 }

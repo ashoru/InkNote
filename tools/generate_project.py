@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate InkNote.xcodeproj/project.pbxproj by scanning Sources/.
+"""Generate InkNote.xcodeproj/project.pbxproj by scanning Sources/ plus the app resources.
 
 Usage: python3 tools/generate_project.py
 Run from the InkNote project root (the directory containing Sources/).
@@ -46,6 +46,29 @@ def main() -> int:
     sources_lines = ",\n".join(f"\t\t\t\t{pbx_id('buildfile:' + rel)}" for rel in swift_files)
     group_children = ",\n".join(f"\t\t\t\t{pbx_id('fileref:' + rel)}" for rel in swift_files)
 
+    # App resources (not Swift sources): the asset catalog (App Icon)
+    # and the String Catalog. Both must be in the resources build
+    # phase, or the icon never ships and String(localized:) lookups
+    # fall back to English on device.
+    resources_phase_id = pbx_id("resourcesphase")
+    resource_refs = [
+        ("Assets.xcassets", "folder.assetcatalog"),
+        ("Localizable.xcstrings", "text.xcstrings"),
+    ]
+    resource_file_refs = []
+    resource_build_files = []
+    for res_path, res_type in resource_refs:
+        rfid = pbx_id("fileref:" + res_path)
+        rbid = pbx_id("buildfile:" + res_path)
+        resource_file_refs.append(
+            f"\t\t{rfid} = {{isa = PBXFileReference; lastKnownFileType = {res_type}; path = {res_path}; sourceTree = \"<group>\"; }};"
+        )
+        resource_build_files.append(
+            f"\t\t{rbid} = {{isa = PBXBuildFile; fileRef = {rfid}; }};"
+        )
+    resources_lines = ",\n".join(f"\t\t\t\t{pbx_id('buildfile:' + p)}" for p, _ in resource_refs)
+    resource_group_children = ",\n".join(f"\t\t\t\t{pbx_id('fileref:' + p)}" for p, _ in resource_refs)
+
     target_id = pbx_id("target:InkNote")
     project_id = pbx_id("project:InkNote")
     main_group_id = pbx_id("group:main")
@@ -71,10 +94,12 @@ def main() -> int:
 
 \t\t/* Begin PBXBuildFile section */
 {chr(10).join(build_files)}
+{chr(10).join(resource_build_files)}
 \t\t/* End PBXBuildFile section */
 
 \t\t/* Begin PBXFileReference section */
 {chr(10).join(file_refs)}
+{chr(10).join(resource_file_refs)}
 \t\t{app_ref_id} = {{isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InkNote.app; sourceTree = BUILT_PRODUCTS_DIR; }};
 \t\t/* End PBXFileReference section */
 
@@ -93,6 +118,7 @@ def main() -> int:
 \t\t\tisa = PBXGroup;
 \t\t\tchildren = (
 \t\t\t\t{sources_group_id},
+{resource_group_children},
 \t\t\t\t{products_group_id},
 \t\t\t);
 \t\t\tsourceTree = "<group>";
@@ -121,6 +147,7 @@ def main() -> int:
 \t\t\tbuildConfigurationList = {target_list_id};
 \t\t\tbuildPhases = (
 \t\t\t\t{sources_phase_id},
+\t\t\t\t{resources_phase_id},
 \t\t\t\t{pbx_id("frameworksphase")},
 \t\t\t);
 \t\t\tbuildRules = (
@@ -152,6 +179,7 @@ def main() -> int:
 \t\t\thasScannedForEncodings = 0;
 \t\t\tknownRegions = (
 \t\t\t\ten,
+\t\t\t\tzh-Hans,
 \t\t\t\tBase,
 \t\t\t);
 \t\t\tmainGroup = {main_group_id};
@@ -163,6 +191,17 @@ def main() -> int:
 \t\t\t);
 \t\t}};
 \t\t/* End PBXProject section */
+
+\t\t/* Begin PBXResourcesBuildPhase section */
+\t\t{resources_phase_id} = {{
+\t\t\tisa = PBXResourcesBuildPhase;
+\t\t\tbuildActionMask = 2147483647;
+\t\t\tfiles = (
+{resources_lines},
+\t\t\t);
+\t\t\trunOnlyForDeploymentPostprocessing = 0;
+\t\t}};
+\t\t/* End PBXResourcesBuildPhase section */
 
 \t\t/* Begin PBXSourcesBuildPhase section */
 \t\t{sources_phase_id} = {{
@@ -182,11 +221,11 @@ def main() -> int:
 \t\t\t\tALWAYS_SEARCH_USER_PATHS = NO;
 \t\t\t\tASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 \t\t\t\tCLANG_ENABLE_MODULES = YES;
-\t\t\t\tCURRENT_PROJECT_VERSION = 2;
+\t\t\t\tCURRENT_PROJECT_VERSION = 3;
 \t\t\t\tDEVELOPMENT_TEAM = "";
 \t\t\t\tIPHONEOS_DEPLOYMENT_TARGET = 18.0;
 \t\t\t\tLOCALIZATION_PREFS = "";
-\t\t\t\tMARKETING_VERSION = 0.1.1;
+\t\t\t\tMARKETING_VERSION = 0.1.2;
 \t\t\t\tSDKROOT = iphoneos;
 \t\t\t\tSWIFT_EMBED_LIBRARIES_WITH_INSTALL = YES;
 \t\t\t\tSWIFT_VERSION = 5.0;
@@ -200,11 +239,11 @@ def main() -> int:
 \t\t\t\tALWAYS_SEARCH_USER_PATHS = NO;
 \t\t\t\tASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 \t\t\t\tCLANG_ENABLE_MODULES = YES;
-\t\t\t\tCURRENT_PROJECT_VERSION = 2;
+\t\t\t\tCURRENT_PROJECT_VERSION = 3;
 \t\t\t\tDEVELOPMENT_TEAM = "";
 \t\t\t\tIPHONEOS_DEPLOYMENT_TARGET = 18.0;
 \t\t\t\tLOCALIZATION_PREFS = "";
-\t\t\t\tMARKETING_VERSION = 0.1.1;
+\t\t\t\tMARKETING_VERSION = 0.1.2;
 \t\t\t\tSDKROOT = iphoneos;
 \t\t\t\tSWIFT_EMBED_LIBRARIES_WITH_INSTALL = YES;
 \t\t\t\tSWIFT_VERSION = 5.0;
@@ -226,6 +265,7 @@ def main() -> int:
 \t\t\t\tINFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 \t\t\t\tINFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 \t\t\t\tPRODUCT_BUNDLE_IDENTIFIER = com.ashoru.inknote;
+\t\t\t\tASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 \t\t\t\tPRODUCT_NAME = InkNote;
 \t\t\t}};
 \t\t\tname = Debug;
@@ -244,6 +284,7 @@ def main() -> int:
 \t\t\t\tINFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 \t\t\t\tINFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 \t\t\t\tPRODUCT_BUNDLE_IDENTIFIER = com.ashoru.inknote;
+\t\t\t\tASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 \t\t\t\tPRODUCT_NAME = InkNote;
 \t\t\t}};
 \t\t\tname = Release;
@@ -279,6 +320,7 @@ def main() -> int:
     print(f"Wrote {PBXPROJ} with {len(swift_files)} Swift files:")
     for rel in swift_files:
         print(f"  {rel}")
+    print("  Resources: Assets.xcassets, Localizable.xcstrings")
     return 0
 
 

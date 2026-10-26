@@ -9,6 +9,7 @@
 		/* Begin PBXBuildFile section */
 		7C75F0ECBDB0BCB824B0F7B2 = {isa = PBXBuildFile; fileRef = 5B98559FEA4E259A7B71CE6C; };
 		D6ECD2321FD51AD374FFE155 = {isa = PBXBuildFile; fileRef = 86B61FC8920AAE03D038803B; };
+		F670FDD0B6AF3DA6C5AE5A46 = {isa = PBXBuildFile; fileRef = EAC8FF0ED52F5026E728368B; };
 		071FA5144A733E26B68DC22A = {isa = PBXBuildFile; fileRef = BEDE137A425A88052F509736; };
 		43A5EE568BE5EC089FCCF7F4 = {isa = PBXBuildFile; fileRef = 7F4992DC004784F88AEEC17A; };
 		6F8B5AC704AE85DE0C6C513B = {isa = PBXBuildFile; fileRef = C0502635BF8EAF511EB033FF; };
@@ -20,11 +21,14 @@
 		E975C868CF735B8AD476B71C = {isa = PBXBuildFile; fileRef = C69A91BBBF15C2270559A462; };
 		D848AD5B33FDF18930FCC476 = {isa = PBXBuildFile; fileRef = 6764BBAA58D6EF818DE3EF89; };
 		317FAF0596C0AD0EB8D21BF6 = {isa = PBXBuildFile; fileRef = 06EF7543B0232F6D064941B6; };
+		7D1DBA83F5517888388F38D2 = {isa = PBXBuildFile; fileRef = F4520D96AC0EDB42E750BB2B; };
+		103732D88C04FF4AB2D6D82B = {isa = PBXBuildFile; fileRef = 9E69AA10CEE2185F7376531E; };
 		/* End PBXBuildFile section */
 
 		/* Begin PBXFileReference section */
 		5B98559FEA4E259A7B71CE6C = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BPlist.swift; sourceTree = "<group>"; };
 		86B61FC8920AAE03D038803B = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanonicalModel.swift; sourceTree = "<group>"; };
+		EAC8FF0ED52F5026E728368B = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayStrings.swift; sourceTree = "<group>"; };
 		BEDE137A425A88052F509736 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormulaEvaluator.swift; sourceTree = "<group>"; };
 		7F4992DC004784F88AEEC17A = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureServices.swift; sourceTree = "<group>"; };
 		C0502635BF8EAF511EB033FF = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportView.swift; sourceTree = "<group>"; };
@@ -36,6 +40,8 @@
 		C69A91BBBF15C2270559A462 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperTemplateView.swift; sourceTree = "<group>"; };
 		6764BBAA58D6EF818DE3EF89 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PencilCanvas.swift; sourceTree = "<group>"; };
 		06EF7543B0232F6D064941B6 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Store.swift; sourceTree = "<group>"; };
+		F4520D96AC0EDB42E750BB2B = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		9E69AA10CEE2185F7376531E = {isa = PBXFileReference; lastKnownFileType = text.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		5EE8456207E0C1526C867DF9 = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InkNote.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		/* End PBXFileReference section */
 
@@ -54,6 +60,8 @@
 			isa = PBXGroup;
 			children = (
 				420CFB359C2A33DC60BFB328,
+				F4520D96AC0EDB42E750BB2B,
+				9E69AA10CEE2185F7376531E,
 				2F3A6B1E78F896718625FF06,
 			);
 			sourceTree = "<group>";
@@ -63,6 +71,7 @@
 			children = (
 				5B98559FEA4E259A7B71CE6C,
 				86B61FC8920AAE03D038803B,
+				EAC8FF0ED52F5026E728368B,
 				BEDE137A425A88052F509736,
 				7F4992DC004784F88AEEC17A,
 				C0502635BF8EAF511EB033FF,
@@ -94,6 +103,7 @@
 			buildConfigurationList = 354589B28580510B6EC24620;
 			buildPhases = (
 				FCA229C23F166EBB0BA5029E,
+				B9C6EB6F79FC54535ACB3053,
 				059DB2086B49B680F85B3555,
 			);
 			buildRules = (
@@ -125,6 +135,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				zh-Hans,
 				Base,
 			);
 			mainGroup = 518DA81DB9B99529C0C0AEBE;
@@ -137,6 +148,18 @@
 		};
 		/* End PBXProject section */
 
+		/* Begin PBXResourcesBuildPhase section */
+		B9C6EB6F79FC54535ACB3053 = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7D1DBA83F5517888388F38D2,
+				103732D88C04FF4AB2D6D82B,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		/* End PBXResourcesBuildPhase section */
+
 		/* Begin PBXSourcesBuildPhase section */
 		FCA229C23F166EBB0BA5029E = {
 			isa = PBXSourcesBuildPhase;
@@ -144,6 +167,7 @@
 			files = (
 				7C75F0ECBDB0BCB824B0F7B2,
 				D6ECD2321FD51AD374FFE155,
+				F670FDD0B6AF3DA6C5AE5A46,
 				071FA5144A733E26B68DC22A,
 				43A5EE568BE5EC089FCCF7F4,
 				6F8B5AC704AE85DE0C6C513B,
@@ -167,11 +191,11 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LOCALIZATION_PREFS = "";
-				MARKETING_VERSION = 0.1.1;
+				MARKETING_VERSION = 0.1.2;
 				SDKROOT = iphoneos;
 				SWIFT_EMBED_LIBRARIES_WITH_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
@@ -185,11 +209,11 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LOCALIZATION_PREFS = "";
-				MARKETING_VERSION = 0.1.1;
+				MARKETING_VERSION = 0.1.2;
 				SDKROOT = iphoneos;
 				SWIFT_EMBED_LIBRARIES_WITH_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
@@ -211,6 +235,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				PRODUCT_BUNDLE_IDENTIFIER = com.ashoru.inknote;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				PRODUCT_NAME = InkNote;
 			};
 			name = Debug;
@@ -229,6 +254,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				PRODUCT_BUNDLE_IDENTIFIER = com.ashoru.inknote;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				PRODUCT_NAME = InkNote;
 			};
 			name = Release;

@@ -17,6 +17,18 @@ import UIKit
 // The body is deliberately broken into small computed properties and
 // a separate row view: a single large SwiftUI expression in this file
 // previously timed out the type checker, so do not re-merge it.
+//
+// Localization (0.1.2): every static label here is a string literal,
+// so SwiftUI treats it as a LocalizedStringKey and looks it up in
+// Localizable.xcstrings (zh-Hans / en, following the system language).
+// User data is the exception and is always shown verbatim: note names,
+// user-created folder names, and the already-localized display string
+// from DisplayStrings. Never pass user data through Text(String),
+// which would re-localize a name that happens to match a catalog key.
+// Folder filtering and Picker tags always use the storage value
+// ("Unsorted", never the display word), so old notes cannot be lost
+// by a language switch; see DisplayStrings for the mapping rule.
+// Search filters only the in-memory manifests, never pages.json.
 
 public struct NotebookListView: View {
     @ObservedObject public var store: DocumentStore
@@ -30,6 +42,7 @@ public struct NotebookListView: View {
     @State private var renameText = ""
     @State private var deleteTarget: NoteManifest?
     @State private var selectedNoteID: UUID?
+    @State private var searchText = ""
 
     public init(store: DocumentStore) {
         self.store = store
@@ -40,11 +53,18 @@ public struct NotebookListView: View {
             .navigationTitle("InkNote")
             .toolbar {
                 ToolbarItemGroup(placement: .primaryAction) {
-                    Button("Import .note") { showingImport = true }
-                    Button("Folder") { showingNewFolder = true }
-                    Button("New Note") { showingNewNote = true }
+                    Button { showingImport = true } label: {
+                        Label("Import .note", systemImage: "square.and.arrow.down")
+                    }
+                    Button { showingNewFolder = true } label: {
+                        Label("Folder", systemImage: "folder")
+                    }
+                    Button { showingNewNote = true } label: {
+                        Label("New Note", systemImage: "square.and.pencil")
+                    }
                 }
             }
+            .searchable(text: $searchText)
             .onAppear { store.loadManifests() }
             .alert("New Note", isPresented: $showingNewNote) {
                 TextField("Note name", text: $newNoteName)
@@ -83,6 +103,14 @@ public struct NotebookListView: View {
         Binding(get: { deleteTarget != nil }, set: { if !$0 { deleteTarget = nil } })
     }
 
+    private var filteredManifests: [NoteManifest] {
+        store.manifests.filter { manifest in
+            guard manifest.folder == selectedFolder else { return false }
+            if searchText.isEmpty { return true }
+            return manifest.name.localizedCaseInsensitiveContains(searchText)
+        }
+    }
+
     private var listView: some View {
         List {
             folderSection
@@ -94,7 +122,8 @@ public struct NotebookListView: View {
         Section("Folder") {
             Picker("Folder", selection: $selectedFolder) {
                 ForEach(store.folders, id: \.self) { folder in
-                    Text(folder).tag(folder)
+                    // Display word localized, tag is the storage value.
+                    Text(verbatim: DisplayStrings.folderDisplayName(folder)).tag(folder)
                 }
             }
             .pickerStyle(.menu)
@@ -102,22 +131,54 @@ public struct NotebookListView: View {
     }
 
     private var notesSection: some View {
-        Section("Notes in \(selectedFolder)") {
-            ForEach(store.manifests.filter { $0.folder == selectedFolder }) { manifest in
-                NoteRowView(store: store, manifest: manifest, onOpen: {
-                    selectedNoteID = manifest.id
-                }, onRename: {
-                    renameTarget = manifest
-                    renameText = manifest.name
-                }, onDelete: {
-                    deleteTarget = manifest
-                })
+        Section {
+            if filteredManifests.isEmpty {
+                emptyState
+            } else {
+                ForEach(filteredManifests) { manifest in
+                    NoteRowView(store: store, manifest: manifest, onOpen: {
+                        selectedNoteID = manifest.id
+                    }, onRename: {
+                        renameTarget = manifest
+                        renameText = manifest.name
+                    }, onDelete: {
+                        deleteTarget = manifest
+                    })
+                }
             }
+        } header: {
+            Text(verbatim: String(format: String(localized: "Notes in %@"), DisplayStrings.folderDisplayName(selectedFolder)))
         }
     }
 
+    private var emptyState: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "note.text")
+                .font(.largeTitle)
+                .foregroundStyle(.secondary)
+            if searchText.isEmpty {
+                Text("No notes yet")
+                    .font(.headline)
+                Button { showingNewNote = true } label: {
+                    Label("New Note", systemImage: "square.and.pencil")
+                }
+                .buttonStyle(.bordered)
+            } else {
+                Text("No matching notes")
+                    .font(.headline)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 24)
+    }
+
     private func createNote() {
-        let name = newNoteName.isEmpty ? "Untitled" : newNoteName
+        // Empty name takes the current system language's default at
+        // creation time ("Untitled" / "Untitled" -> "未命名" in zh).
+        // It is a name, not a filter key, so existing notes keep
+        // whatever name they already have when the language changes.
+        let name = newNoteName.isEmpty ? String(localized: "Untitled") : newNoteName
         let document = store.createNote(name: name, folder: selectedFolder)
         newNoteName = ""
         selectedNoteID = document.manifest.id
@@ -156,9 +217,9 @@ private struct NoteRowView: View {
             HStack {
                 ThumbnailView(store: store, noteID: manifest.id)
                 VStack(alignment: .leading) {
-                    Text(manifest.name).lineLimit(1)
+                    Text(verbatim: manifest.name).lineLimit(1)
                     HStack(spacing: 4) {
-                        Text(manifest.source == "imported-note" ? "Imported" : "InkNote")
+                        Text(verbatim: DisplayStrings.sourceDisplayName(manifest.source))
                         Text(manifest.modifiedAt, style: .date)
                     }
                     .font(.caption)
@@ -167,15 +228,22 @@ private struct NoteRowView: View {
             }
         }
         .swipeActions {
-            Button("Rename", action: onRename).tint(.blue)
-            Button("Delete", role: .destructive, action: onDelete)
+            Button(action: onRename) {
+                Label("Rename", systemImage: "pencil")
+            }
+            .tint(.blue)
+            Button(role: .destructive, action: onDelete) {
+                Label("Delete", systemImage: "trash")
+            }
         }
     }
 }
 
 /// Loads only thumb.png for one row, on a background task. If there is
 /// no thumbnail yet, a plain placeholder is shown; the list never
-/// renders the full note to make a thumbnail.
+/// renders the full note to make a thumbnail. Thumbnail size is one
+/// step up from v1 (56x72, capped below the 60x76 budget) so rows read
+/// better without making the list stutter.
 private struct ThumbnailView: View {
     var store: DocumentStore
     var noteID: UUID
@@ -190,7 +258,7 @@ private struct ThumbnailView: View {
                 Color.gray.opacity(0.2)
             }
         }
-        .frame(width: 44, height: 56)
+        .frame(width: 56, height: 72)
         .clipShape(RoundedRectangle(cornerRadius: 6))
         .task(id: noteID) {
             let dir = store.noteDirectory(for: noteID)
@@ -225,9 +293,11 @@ private struct NoteDestinationView: View {
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
-                    Button("Retry") {
+                    Button {
                         loadFailed = false
                         attempt += 1
+                    } label: {
+                        Label("Retry", systemImage: "arrow.clockwise")
                     }
                     .buttonStyle(.borderedProminent)
                 }
