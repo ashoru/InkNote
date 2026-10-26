@@ -207,6 +207,8 @@ private struct NoteDestinationView: View {
     var store: DocumentStore
     var noteID: UUID
     @State private var document: InkNoteDocument?
+    @State private var loadFailed = false
+    @State private var attempt = 0
     var body: some View {
         Group {
             if let document = document {
@@ -215,13 +217,40 @@ private struct NoteDestinationView: View {
                 } else {
                     NoteEditorView(store: store, document: document)
                 }
+            } else if loadFailed {
+                VStack(spacing: 12) {
+                    Text("Failed to load note")
+                        .font(.headline)
+                    Text("Your note file is still on this device and was not deleted. Tap Retry to load it again.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                    Button("Retry") {
+                        loadFailed = false
+                        attempt += 1
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+                .padding()
             } else {
                 ProgressView("Loading note…")
-                    .task {
-                        store.loadDocument(id: noteID) { loaded in
-                            document = loaded
-                        }
-                    }
+            }
+        }
+        .task(id: attempt) {
+            load()
+        }
+    }
+    private func load() {
+        if document != nil { return }
+        if let cached = store.documents[noteID] {
+            document = cached
+            return
+        }
+        store.loadDocument(id: noteID) { loaded in
+            if let loaded = loaded {
+                document = loaded
+            } else {
+                loadFailed = true
             }
         }
     }

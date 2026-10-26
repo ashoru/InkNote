@@ -54,7 +54,7 @@ public final class DocumentStore: ObservableObject {
             for dir in dirs where dir.pathExtension == "inknote" {
                 let manifestURL = dir.appendingPathComponent("manifest.json")
                 guard let data = try? Data(contentsOf: manifestURL),
-                      let manifest = try? JSONDecoder().decode(NoteManifest.self, from: data),
+                      let manifest = try? InkNoteCodec.decoder.decode(NoteManifest.self, from: data),
                       NoteFormatMigration.canOpen(formatVersion: manifest.formatVersion) else { continue }
                 loaded.append(manifest)
                 folderSet.insert(manifest.folder)
@@ -73,9 +73,9 @@ public final class DocumentStore: ObservableObject {
             guard let self = self else { return }
             let dir = self.noteDirectory(for: id)
             guard let manifestData = try? Data(contentsOf: dir.appendingPathComponent("manifest.json")),
-                  let manifest = try? JSONDecoder().decode(NoteManifest.self, from: manifestData),
+                  let manifest = try? InkNoteCodec.decoder.decode(NoteManifest.self, from: manifestData),
                   let pagesData = try? Data(contentsOf: dir.appendingPathComponent("pages.json")),
-                  let pages = try? JSONDecoder().decode([NotePage].self, from: pagesData) else {
+                  let pages = try? InkNoteCodec.decoder.decode([NotePage].self, from: pagesData) else {
                 DispatchQueue.main.async { completion(nil) }
                 return
             }
@@ -113,11 +113,8 @@ public final class DocumentStore: ObservableObject {
             let dir = self.noteDirectory(for: doc.manifest.id)
             do {
                 try self.fileManager.createDirectory(at: dir, withIntermediateDirectories: true)
-                let encoder = JSONEncoder()
-                encoder.outputFormatting = [.sortedKeys]
-                encoder.dateEncodingStrategy = .iso8601
-                let manifestData = try encoder.encode(doc.manifest)
-                let pagesData = try encoder.encode(doc.pages)
+                let manifestData = try InkNoteCodec.encoder.encode(doc.manifest)
+                let pagesData = try InkNoteCodec.encoder.encode(doc.pages)
                 try self.writeAtomically(data: manifestData, to: dir.appendingPathComponent("manifest.json"))
                 try self.writeAtomically(data: pagesData, to: dir.appendingPathComponent("pages.json"))
             } catch {
@@ -179,10 +176,10 @@ public final class DocumentStore: ObservableObject {
                 guard let self = self else { return }
                 let dir = self.noteDirectory(for: id)
                 guard let data = try? Data(contentsOf: dir.appendingPathComponent("manifest.json")),
-                      var manifest = try? JSONDecoder().decode(NoteManifest.self, from: data) else { return }
+                      var manifest = try? InkNoteCodec.decoder.decode(NoteManifest.self, from: data) else { return }
                 manifest.name = newName
                 manifest.modifiedAt = Date()
-                if let encoded = try? JSONEncoder().encode(manifest) {
+                if let encoded = try? InkNoteCodec.encoder.encode(manifest) {
                     try? self.writeAtomically(data: encoded, to: dir.appendingPathComponent("manifest.json"))
                 }
                 DispatchQueue.main.async {

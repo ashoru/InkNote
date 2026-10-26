@@ -30,6 +30,27 @@ public enum InkNoteFormat {
     public static let currentVersion = 1
 }
 
+/// Shared JSON codec for all InkNote on-disk files.
+/// Date strategy MUST be identical on encode and decode: .iso8601.
+/// Bug fixed 2026-10-26: saveDocument used .iso8601 but loadManifests,
+/// loadDocument and renameNote used the default secondsSince1970
+/// decoder, so every saved note failed to load and the editor spun
+/// forever on Loading note. Never reintroduce a bare JSONDecoder or
+/// JSONEncoder for InkNote files; use InkNoteCodec everywhere.
+public enum InkNoteCodec {
+    public static let encoder: JSONEncoder = {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys]
+        encoder.dateEncodingStrategy = .iso8601
+        return encoder
+    }()
+    public static let decoder: JSONDecoder = {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        return decoder
+    }()
+}
+
 /// A single sampled or control point of one stroke.
 ///
 /// - sampled: points as recorded by the source device / imported file

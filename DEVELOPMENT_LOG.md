@@ -297,3 +297,63 @@ Not verified by the builder. Please run each item and report back:
   for example in Xcode with your own Apple ID, or with a sideloading
   tool you trust, before installing it on an iPhone or iPad. Do not
   present the Release download as install-and-run.
+
+## 10. Fix 0.1.1 build 2 — notes that could not be opened (Loading note forever)
+
+- User report (device, 2026-10-26): a newly created note (ttt) appeared
+  in the list but opening it showed only "Loading note..." forever.
+  This is accepted as fact; the v1 build passing does not contradict it.
+- Root cause, one sentence: saveDocument wrote manifest.json with
+  JSONEncoder dateEncodingStrategy .iso8601, but loadManifests,
+  loadDocument and renameNote all read with a bare JSONDecoder whose
+  default date strategy is secondsSince1970, so decoding an ISO8601
+  date string always failed.
+- Consequence chain: createNote saved in memory, so the list showed
+  ttt; opening it called loadDocument, decoding failed, completion
+  was nil, NoteDestinationView had no error state and its .task ran
+  only once, so it spun forever. After a restart, loadManifests
+  skipped every saved note, so the list could go empty. The files on
+  disk were never deleted and no note data was lost; fixing the
+  decoder makes them readable again.
+- Fix 1, shared codec (CanonicalModel.swift): new InkNoteCodec with
+  one JSONEncoder (.sortedKeys, .iso8601) and one JSONDecoder
+  (.iso8601), Foundation-only so the Mac validation tool uses the
+  exact same codec as the app. Never reintroduce a bare JSONDecoder
+  or JSONEncoder for InkNote files.
+- Fix 2, Store.swift: all 7 codec call sites now use InkNoteCodec:
+  loadManifests (1), loadDocument (manifest + pages, 2),
+  saveDocument (manifest + pages, 2), renameNote (decode + encode, 2).
+  renameNote previously also wrote dates back with a bare encoder
+  (numbers), which would have failed the next ISO8601 read; it now
+  uses the shared encoder. A grep of Sources/ after the fix shows no
+  bare codec call site outside the InkNoteCodec definition itself.
+- Fix 3, NotebookListView NoteDestinationView: cache-first (use
+  store.documents[noteID] if already in memory, no disk wait); on
+  disk-load failure show "Failed to load note" + a Retry button that
+  increments an attempt counter and really re-runs the load via
+  .task(id: attempt); a failed retry does not crash and does not
+  spin forever. The failure text states the file was not deleted.
+- Regression validation, Mac offline, exit 0, RESULT PASS:
+  a Swift script compiled with CanonicalModel.swift only, using
+  InkNoteCodec, wrote a manifest (name ttt, folder tt) + 2 pages
+  with a 2-point stroke, read them back, and asserted name, both
+  dates, page count and stroke points; it also read an old-format
+  ISO8601 manifest file and asserted it opens; it also asserted
+  the default secondsSince1970 decoder fails on that same file,
+  confirming the root cause. Two script bugs found and fixed during
+  validation itself (top-level code must live in main.swift when
+  compiling several files; a test timestamp was 2025, not 2026) —
+  neither was an app bug.
+- Build: iMac xcodebuild unsigned, ** BUILD SUCCEEDED **, Xcode 26.6.
+  DerivedData for InkNote was cleaned after the build.
+- Version: 0.1.1 build 2 (MARKETING_VERSION 0.1.1,
+  CURRENT_PROJECT_VERSION 2, bundle com.ashoru.inknote, minimum
+  iOS 18.0). This section is the fix record; the release record is
+  section 11.
+- Device retest (not yet done by the builder, must be done by the
+  user after installing the new build): 1) old note ttt reappears
+  in the list after restart; 2) open ttt, it opens instead of
+  spinning; 3) write in it, close and reopen, writing is still
+  there; 4) create a new note, open it, write, restart the app,
+  open it again. A retry button appearing at all means the load
+  still failed and must be reported, not worked around silently.
