@@ -357,3 +357,40 @@ Not verified by the builder. Please run each item and report back:
   there; 4) create a new note, open it, write, restart the app,
   open it again. A retry button appearing at all means the load
   still failed and must be reported, not worked around silently.
+
+## 11. Release 0.1.1 build 2 — fix published
+
+- Fix pushed first, then released (same snapshot model as section 9):
+  Mac commit 58953636a08ffa42e23fd5f412327bda61583d50, tree
+  66d60b140541830cbc74d29c75319baeb68a9060; GitHub commit
+  0b7977cf1c5981821412d1e9b76953c01971aad2 with the identical tree.
+  Mac and GitHub commit hashes differ, file trees are identical.
+  Changed files (6): DEVELOPMENT_LOG.md, project.pbxproj,
+  Sources/CanonicalModel.swift, Sources/NotebookListView.swift,
+  Sources/Store.swift, tools/generate_project.py. No Validation,
+  ValidationSamples, .note, .ipa or .app file was staged.
+- Actions run: workflow_dispatch, run 40317713544, conclusion
+  success (polled to completed, not merely triggered).
+- Release: https://github.com/ashoru/InkNote/releases/tag/v0.1.1-build2,
+  name "InkNote 0.1.1 (build 2)", not a draft, not a prerelease.
+  Assets: InkNote-0.1.1-build2-unsigned.ipa (286145 bytes) and
+  InkNote-0.1.1-build2-unsigned.ipa.sha256.
+- IPA verification, done locally after download from the Release
+  (not from the build log alone): shasum -c on the .sha256 file
+  passed, SHA-256
+  316ca47356ba8b22e767ba85092fe5b7002e8c2f0f80f896c33b0c19a91e5c19.
+  Unpacked Info.plist: CFBundleIdentifier com.ashoru.inknote,
+  CFBundleShortVersionString 0.1.1, CFBundleVersion 2,
+  MinimumOSVersion 18.0, CFBundleExecutable InkNote,
+  UIDeviceFamily [1, 2]. Main binary Payload/InkNote.app/InkNote,
+  1063872 bytes, present. The local IPA copy was kept only for this
+  verification in /tmp and was deleted afterwards.
+- Sideloading note, unchanged from section 9: the IPA is unsigned.
+  Downloading it does not install it on a device. Sign it yourself,
+  for example in Xcode with your own Apple ID, or with a sideloading
+  tool you trust, before installing it on an iPhone or iPad.
+- What this build fixes on device (to be confirmed by the user, not
+  claimed by the builder): saved notes that previously failed to
+  decode now open; a load failure now shows an error with a real
+  Retry instead of spinning forever; notes already on disk were
+  never deleted and become readable again after this update.
