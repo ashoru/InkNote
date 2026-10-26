@@ -620,3 +620,53 @@ Not verified by the builder. Please run each item and report back:
 8. iPad detail placeholder: icon + sentence + New Note button;
    tapping New Note creates a note in the unclassified folder,
    visible in the list to open (see the limitation in 12.2).
+
+## 13. Release 0.1.2 build 3 — localization and UI polish published
+
+- Change pushed first, then released (same snapshot model as
+  section 9): Mac commit c42cc479d905dc5b87ac617068827dae006d14c6,
+  tree 53440cdf8f655dd00cbbfcab4b14bd12e63799ce; GitHub commit
+  167b7819c570eb664c95622186eebc170a52c055 with the identical
+  tree. Mac and GitHub commit hashes differ, file trees are
+  identical. Changed files (32): 15 App Icon PNGs + 2 Contents.json
+  files, Localizable.xcstrings, 10 Swift files (9 modified, 1 new
+  DisplayStrings.swift), project.pbxproj, this log, and 2 tool
+  scripts (generate_project.py, make_appicon.swift). No Validation,
+  ValidationSamples, .note, .ipa or .app file was staged. The
+  snapshot push script for InkNote lives outside the repo at
+  ~/workspace/bin/gh-gitdata-push-inknote.py (adapted from the
+  AT Music script; it verifies parent tree equality and new tree
+  equality, and uses a dedicated git-ssh wrapper without a hardcoded
+  host, since the plain ssh wrapper's hardcoded host breaks git's
+  own host argument).
+- Actions run: workflow_dispatch, run 40321789624, conclusion
+  success (polled to completed, not merely triggered).
+  https://github.com/ashoru/InkNote/actions/runs/40321789624
+- Release: https://github.com/ashoru/InkNote/releases/tag/v0.1.2-build3,
+  name "InkNote 0.1.2 (build 3)", not a draft, not a prerelease.
+  Assets: InkNote-0.1.2-build3-unsigned.ipa (490049 bytes) and
+  InkNote-0.1.2-build3-unsigned.ipa.sha256.
+- IPA verification, done locally after download from the Release
+  (not from the build log alone): shasum -c on the .sha256 file
+  passed, SHA-256
+  aa882042d315645644ca1bdb159d31ab4503a55a1e2e4cc71a340b86b7159e1c.
+  Unpacked Info.plist: CFBundleIdentifier com.ashoru.inknote,
+  CFBundleShortVersionString 0.1.2, CFBundleVersion 3,
+  MinimumOSVersion 18.0, CFBundleExecutable InkNote,
+  UIDeviceFamily [1, 2]. Main binary Payload/InkNote.app/InkNote,
+  1204424 bytes, present. The bundle also contains en.lproj and
+  zh-Hans.lproj and the App Icon PNGs. The local IPA copy was kept
+  only for this verification in /tmp and was deleted afterwards.
+- Sideloading note, unchanged from section 9: the IPA is unsigned.
+  Downloading it does not install it on a device. Sign it yourself,
+  for example in Xcode with your own Apple ID, or with a sideloading
+  tool you trust, before installing it on an iPhone or iPad.
+- What this build changes on device (to be confirmed by the user,
+  not claimed by the builder): Chinese and English interfaces that
+  follow the system language, with the old-note folder mapping
+  keeping every existing note visible; SF Symbols toolbars with
+  Previous / Next in both editors; a larger lazy thumbnail, search
+  over list manifests, real empty states, page margin + shadow on
+  the system grouped background with the paper staying white, a
+  transient Save confirmation, and the new App Icon. The device
+  retest list is section 12.6.
