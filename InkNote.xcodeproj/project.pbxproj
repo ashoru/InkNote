@@ -1,0 +1,260 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+		/* Begin PBXBuildFile section */
+		7C75F0ECBDB0BCB824B0F7B2 = {isa = PBXBuildFile; fileRef = 5B98559FEA4E259A7B71CE6C; };
+		D6ECD2321FD51AD374FFE155 = {isa = PBXBuildFile; fileRef = 86B61FC8920AAE03D038803B; };
+		071FA5144A733E26B68DC22A = {isa = PBXBuildFile; fileRef = BEDE137A425A88052F509736; };
+		43A5EE568BE5EC089FCCF7F4 = {isa = PBXBuildFile; fileRef = 7F4992DC004784F88AEEC17A; };
+		6F8B5AC704AE85DE0C6C513B = {isa = PBXBuildFile; fileRef = C0502635BF8EAF511EB033FF; };
+		C4DEBF6F02DAC668552059AE = {isa = PBXBuildFile; fileRef = 40B411E3501830346081D1E0; };
+		747AB9224D5165BE04352AB1 = {isa = PBXBuildFile; fileRef = 5474548334DF4C9499114A63; };
+		29FF2702CC21D03B25C15BAF = {isa = PBXBuildFile; fileRef = 9B2651972B390E487E9AF96F; };
+		13DFA9D88256CEBBF7A950CF = {isa = PBXBuildFile; fileRef = B0CF4930D4A0F706698FEFB2; };
+		89999B9A8C48FAE21FE4C1B1 = {isa = PBXBuildFile; fileRef = 8B68813A341657A268F9AC18; };
+		E975C868CF735B8AD476B71C = {isa = PBXBuildFile; fileRef = C69A91BBBF15C2270559A462; };
+		D848AD5B33FDF18930FCC476 = {isa = PBXBuildFile; fileRef = 6764BBAA58D6EF818DE3EF89; };
+		317FAF0596C0AD0EB8D21BF6 = {isa = PBXBuildFile; fileRef = 06EF7543B0232F6D064941B6; };
+		/* End PBXBuildFile section */
+
+		/* Begin PBXFileReference section */
+		5B98559FEA4E259A7B71CE6C = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BPlist.swift; sourceTree = "<group>"; };
+		86B61FC8920AAE03D038803B = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanonicalModel.swift; sourceTree = "<group>"; };
+		BEDE137A425A88052F509736 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormulaEvaluator.swift; sourceTree = "<group>"; };
+		7F4992DC004784F88AEEC17A = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureServices.swift; sourceTree = "<group>"; };
+		C0502635BF8EAF511EB033FF = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportView.swift; sourceTree = "<group>"; };
+		40B411E3501830346081D1E0 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InkNoteApp.swift; sourceTree = "<group>"; };
+		5474548334DF4C9499114A63 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteEditorView.swift; sourceTree = "<group>"; };
+		9B2651972B390E487E9AF96F = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteImporter.swift; sourceTree = "<group>"; };
+		B0CF4930D4A0F706698FEFB2 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotebookListView.swift; sourceTree = "<group>"; };
+		8B68813A341657A268F9AC18 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFNoteView.swift; sourceTree = "<group>"; };
+		C69A91BBBF15C2270559A462 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperTemplateView.swift; sourceTree = "<group>"; };
+		6764BBAA58D6EF818DE3EF89 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PencilCanvas.swift; sourceTree = "<group>"; };
+		06EF7543B0232F6D064941B6 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Store.swift; sourceTree = "<group>"; };
+		5EE8456207E0C1526C867DF9 = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InkNote.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		/* End PBXFileReference section */
+
+		/* Begin PBXFrameworksBuildPhase section */
+		059DB2086B49B680F85B3555 = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		/* End PBXFrameworksBuildPhase section */
+
+		/* Begin PBXGroup section */
+		518DA81DB9B99529C0C0AEBE = {
+			isa = PBXGroup;
+			children = (
+				420CFB359C2A33DC60BFB328,
+				2F3A6B1E78F896718625FF06,
+			);
+			sourceTree = "<group>";
+		};
+		420CFB359C2A33DC60BFB328 = {
+			isa = PBXGroup;
+			children = (
+				5B98559FEA4E259A7B71CE6C,
+				86B61FC8920AAE03D038803B,
+				BEDE137A425A88052F509736,
+				7F4992DC004784F88AEEC17A,
+				C0502635BF8EAF511EB033FF,
+				40B411E3501830346081D1E0,
+				5474548334DF4C9499114A63,
+				9B2651972B390E487E9AF96F,
+				B0CF4930D4A0F706698FEFB2,
+				8B68813A341657A268F9AC18,
+				C69A91BBBF15C2270559A462,
+				6764BBAA58D6EF818DE3EF89,
+				06EF7543B0232F6D064941B6,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		2F3A6B1E78F896718625FF06 = {
+			isa = PBXGroup;
+			children = (
+				5EE8456207E0C1526C867DF9,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		/* End PBXGroup section */
+
+		/* Begin PBXNativeTarget section */
+		4679EE77FD02BDA60F6480FE = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 354589B28580510B6EC24620;
+			buildPhases = (
+				FCA229C23F166EBB0BA5029E,
+				059DB2086B49B680F85B3555,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = InkNote;
+			productName = InkNote;
+			productReference = 5EE8456207E0C1526C867DF9;
+			productType = "com.apple.product-type.application";
+		};
+		/* End PBXNativeTarget section */
+
+		/* Begin PBXProject section */
+		6E5228A48E56FD707F0A36B0 = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 2600;
+				TargetAttributes = {
+					4679EE77FD02BDA60F6480FE = {
+						CreatedOnToolsVersion = 26.6;
+					};
+				};
+			};
+			buildConfigurationList = 1F4E3D13C2320EDA50221924;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 518DA81DB9B99529C0C0AEBE;
+			productRefGroup = 2F3A6B1E78F896718625FF06;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4679EE77FD02BDA60F6480FE,
+			);
+		};
+		/* End PBXProject section */
+
+		/* Begin PBXSourcesBuildPhase section */
+		FCA229C23F166EBB0BA5029E = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7C75F0ECBDB0BCB824B0F7B2,
+				D6ECD2321FD51AD374FFE155,
+				071FA5144A733E26B68DC22A,
+				43A5EE568BE5EC089FCCF7F4,
+				6F8B5AC704AE85DE0C6C513B,
+				C4DEBF6F02DAC668552059AE,
+				747AB9224D5165BE04352AB1,
+				29FF2702CC21D03B25C15BAF,
+				13DFA9D88256CEBBF7A950CF,
+				89999B9A8C48FAE21FE4C1B1,
+				E975C868CF735B8AD476B71C,
+				D848AD5B33FDF18930FCC476,
+				317FAF0596C0AD0EB8D21BF6,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		/* End PBXSourcesBuildPhase section */
+
+		/* Begin XCBuildConfiguration section */
+		E8585283E04D5C48F37AF471 = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LOCALIZATION_PREFS = "";
+				MARKETING_VERSION = 0.1.0;
+				SDKROOT = iphoneos;
+				SWIFT_EMBED_LIBRARIES_WITH_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		9487D9B510BBB6F76BFAF854 = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LOCALIZATION_PREFS = "";
+				MARKETING_VERSION = 0.1.0;
+				SDKROOT = iphoneos;
+				SWIFT_EMBED_LIBRARIES_WITH_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		BC3F4F3DBCA1C44083225A50 = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Manual;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = "";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				PRODUCT_BUNDLE_IDENTIFIER = com.ashoru.inknote;
+				PRODUCT_NAME = InkNote;
+			};
+			name = Debug;
+		};
+		7D2124529FBF5B7EB897C6BB = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Manual;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = "";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				PRODUCT_BUNDLE_IDENTIFIER = com.ashoru.inknote;
+				PRODUCT_NAME = InkNote;
+			};
+			name = Release;
+		};
+		/* End XCBuildConfiguration section */
+
+		/* Begin XCConfigurationList section */
+		1F4E3D13C2320EDA50221924 = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E8585283E04D5C48F37AF471,
+				9487D9B510BBB6F76BFAF854,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		354589B28580510B6EC24620 = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BC3F4F3DBCA1C44083225A50,
+				7D2124529FBF5B7EB897C6BB,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		/* End XCConfigurationList section */
+	};
+	rootObject = 6E5228A48E56FD707F0A36B0;
+}

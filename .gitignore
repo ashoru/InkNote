@@ -1,0 +1,12 @@
+DerivedData/
+build/
+*.xcworkspace/
+xcuserdata/
+*.ipa
+*.app
+/tmp/
+Validation/
+ValidationSamples/
+*.note
+*.nbn
+*.ntb
